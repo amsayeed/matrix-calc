@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Matrix Calculator (With Steps & Explanation)</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        h1 {
+            color: #1a1a2e;
+            text-align: center;
+            margin-bottom: 3rem;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        .section {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .section-title {
+            font-size: 1.5rem;
+            color: #2566d1;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: #4e8cf7;
+            border-radius: 2px;
+        }
+        .matrix-size-selector {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        .matrix-container {
+            display: flex;
+            gap: 3rem;
+            flex-wrap: wrap;
+        }
+        .matrix-wrapper {
+            flex: 1;
+            min-width: 250px;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        .matrix-control-wrapper {
+            background: white;
+            border: 2px solid #e1e4e8;
+            border-radius: 12px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+        .matrix-control-wrapper.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .matrix-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            color: #333;
+        }
+        .checkbox-label input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        .matrix-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .small-btn {
+            padding: 0.4rem 0.8rem;
+            font-size: 14px;
+            border-radius: 6px;
+            border: 1px solid #e1e4e8;
+            background: white;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+        .small-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .add-btn {
+            background: #e6f4ff;
+            color: #0969da;
+            border-color: #0969da;
+        }
+        .add-btn:hover {
+            background: #dbeafe;
+        }
+        .sub-btn {
+            background: #ffebe9;
+            color: #cf222e;
+            border-color: #cf222e;
+        }
+        .sub-btn:hover {
+            background: #fee2e2;
+        }
+        .clear-btn {
+            background: #fff8c5;
+            color: #7d4e00;
+            border-color: #fbbf24;
+        }
+        .clear-btn:hover {
+            background: #fef3c7;
+        }
+        .identity-btn {
+            background: #e6fffa;
+            color: #0e7490;
+            border-color: #06b6d4;
+        }
+        .identity-btn:hover {
+            background: #cffafe;
+        }
+        .matrix-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+        .matrix-input { 
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        .matrix-row { 
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .matrix-row:last-child {
+            margin-bottom: 0;
+        }
+        .matrix-row input { 
+            width: 60px;
+            height: 45px;
+            text-align: center;
+            border: 2px solid #e1e4e8;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .matrix-row input:focus {
+            outline: none;
+            border-color: #4e8cf7;
+            box-shadow: 0 0 0 3px rgba(78, 140, 247, 0.1);
+        }
+        .operation-panel {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 1rem;
+        }
+        label { 
+            font-weight: 600;
+            color: #444;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        select { 
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e1e4e8;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+        select:focus {
+            outline: none;
+            border-color: #4e8cf7;
+        }
+        button { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        button:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .output { 
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            animation: slideIn 0.5s ease;
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        textarea { width: 100%; min-height: 60px;}
+        .hide { display: none; }
+        .flex { 
+            display: flex;
+            gap: 2rem;
+            align-items: flex-start;
+        }
+        .step { 
+            background: linear-gradient(135deg, #f5f7ff 0%, #e8ecff 100%);
+            border-left: 4px solid #667eea;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 12px;
+            font-size: 15px;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+        }
+        .step-title { 
+            font-weight: 700;
+            color: #4834d4;
+            margin-bottom: 1rem;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .step-title::before {
+            content: '▶';
+            font-size: 14px;
+        }
+        .step-math { 
+            font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 0.75rem 0;
+            border: 1px solid #e1e8ed;
+            display: block;
+            font-size: 14px;
+            line-height: 1.6;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .final-result {
+            background: linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%);
+            border: none;
+            padding: 2rem;
+            border-radius: 16px;
+            margin-top: 2rem;
+            font-size: 18px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(150, 230, 161, 0.3);
+        }
+        .formula-box {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+            border: none;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin: 1rem 0;
+            font-style: normal;
+            font-weight: 500;
+            color: #2d3436;
+            box-shadow: 0 2px 8px rgba(250, 177, 160, 0.3);
+        }
+        /* Encode/Decode Section Styles */
+        .encode-decode-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            margin: 2rem 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .encode-input-group {
+            margin-bottom: 20px;
+        }
+        .encode-input-group > div {
+            margin-bottom: 10px;
+        }
+        .matrix-section {
+            margin: 20px 0;
+        }
+        .encoding-matrix {
+            display: inline-block;
+            background: white;
+            border: 2px solid #333;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .matrix-row {
+            display: flex;
+            gap: 10px;
+            margin: 5px 0;
+        }
+        .matrix-cell {
+            width: 60px;
+            padding: 8px;
+            font-size: 16px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        textarea#message {
+            width: 100%;
+            max-width: 500px;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .input-hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        .compute-btn {
+            margin-left: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .compute-btn:hover {
+            background: #0056b3;
+        }
+        .encoded-output {
+            background: white;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            border: 1px solid #ddd;
+        }
+        .encoded-display {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .encoded-display code {
+            flex: 1;
+            padding: 10px;
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+            word-break: break-all;
+        }
+        .copy-btn {
+            padding: 8px 16px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .copy-btn:hover {
+            background: #218838;
+        }
+        .copy-feedback {
+            color: #28a745;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .error {
+            color: #dc3545;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            .matrix-container {
+                flex-direction: column;
+            }
+            .operation-panel {
+                width: 100% !important;
+                margin-top: 2rem;
+            }
+            .encode-input-wrapper {
+                flex-direction: column;
+                gap: 2rem;
+            }
+            .encode-right {
+                width: 100%;
+            }
+            .matrix-row input {
+                width: 50px;
+                height: 40px;
+            }
+            .matrix-controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .matrix-buttons {
+                margin-top: 0.5rem;
+            }
+        }
+        
+        /* Additional enhancements */
+        .encode-input-group select {
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .encode-matrix-label {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: block;
+            color: #333;
+            font-size: 1.1rem;
+        }
+        small {
+            display: block;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>✨ Matrix Calculator</h1>
+    
+    <div class="section">
+        <h2 class="section-title">Matrix Operations</h2>
+        
+        <div class="matrix-size-selector">
+            <label style="margin-right: 1rem;">Matrix A Size:</label>
+            <select id="matrix-a-rows" style="width: 80px;">
+                <option value="1">1</option>
+                <option value="2" selected>2</option>
+                <option value="3">3</option>
+            </select>
+            <span style="margin: 0 0.5rem;">×</span>
+            <select id="matrix-a-cols" style="width: 80px;">
+                <option value="1">1</option>
+                <option value="2" selected>2</option>
+                <option value="3">3</option>
+            </select>
+            
+            <label style="margin-left: 2rem; margin-right: 1rem;">Matrix B Size:</label>
+            <select id="matrix-b-rows" style="width: 80px;">
+                <option value="1">1</option>
+                <option value="2" selected>2</option>
+                <option value="3">3</option>
+            </select>
+            <span style="margin: 0 0.5rem;">×</span>
+            <select id="matrix-b-cols" style="width: 80px;">
+                <option value="1">1</option>
+                <option value="2" selected>2</option>
+                <option value="3">3</option>
+            </select>
+            
+            <button onclick="renderMatrices()" style="margin-left: 2rem; padding: 0.5rem 1.5rem;">Update Sizes</button>
+        </div>
+        
+        <div class="matrix-container">
+            <div class="matrix-wrapper">
+                <div class="matrix-control-wrapper">
+                    <div class="matrix-controls">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="matrix-a-active" checked onchange="updateMatrixState()">
+                            <span>Use Matrix A</span>
+                        </label>
+                        <div class="matrix-buttons">
+                            <button onclick="addToMatrix('A', 1)" class="small-btn add-btn">+1</button>
+                            <button onclick="addToMatrix('A', -1)" class="small-btn sub-btn">-1</button>
+                            <button onclick="clearMatrix('A')" class="small-btn clear-btn">Clear</button>
+                            <button onclick="identityMatrix('A')" class="small-btn identity-btn">Identity</button>
+                        </div>
+                    </div>
+                    <div id="matrixA-container"></div>
+                </div>
+                
+                <div class="matrix-control-wrapper">
+                    <div class="matrix-controls">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="matrix-b-active" checked onchange="updateMatrixState()">
+                            <span>Use Matrix B</span>
+                        </label>
+                        <div class="matrix-buttons">
+                            <button onclick="addToMatrix('B', 1)" class="small-btn add-btn">+1</button>
+                            <button onclick="addToMatrix('B', -1)" class="small-btn sub-btn">-1</button>
+                            <button onclick="clearMatrix('B')" class="small-btn clear-btn">Clear</button>
+                            <button onclick="identityMatrix('B')" class="small-btn identity-btn">Identity</button>
+                        </div>
+                    </div>
+                    <div id="matrixB-container"></div>
+                </div>
+            </div>
+            
+            <div class="operation-panel" style="flex: 0 0 350px;">
+                <label>Select Operation:</label>
+                <select id="operation" onchange="showHideMatrixB()">
+                    <option value="add">Addition (A + B)</option>
+                    <option value="sub">Subtraction (A - B)</option>
+                    <option value="mul">Multiplication (A × B)</option>
+                    <option value="div">Division (A ÷ B)</option>
+                    <option value="det">Determinant |A|</option>
+                    <option value="inv">Inverse A⁻¹</option>
+                    <option value="trace">Trace (A)</option>
+                </select>
+                <button onclick="compute()" style="width: 100%; margin-top: 1rem;">Calculate</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="section encode-decode-section">
+        <h2 class="section-title">🔐 Message Encoder/Decoder (2×2 matrices only)</h2>
+        
+        <div class="encode-input-wrapper">
+            <div class="encode-left">
+                <div class="encode-input-group">
+                    <label>Mode:</label>
+                    <select id="encode-mode" onchange="updateEncodePlaceholder()">
+                        <option value="encode">Encode Text → Numbers</option>
+                        <option value="decode">Decode Numbers → Text</option>
+                    </select>
+                    
+                    <label id="message-label" style="margin-top: 1rem;">Message to encode:</label>
+                    <textarea id="message" placeholder="Enter text to encode (e.g., HELLO)"></textarea>
+                    <small id="input-hint" style="color: #666; font-style: italic;">Letters will be converted to numbers (A=1, B=2, etc.). Odd-length messages will be padded with 'X'.</small>
+                </div>
+            </div>
+            
+            <div class="encode-right">
+                <label class="encode-matrix-label">Encoding Matrix (2×2):</label>
+                <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px;">
+                    <div class="matrix-row">
+                        <input type="number" id="enc00" value="2" class="matrix-cell">
+                        <input type="number" id="enc01" value="1" class="matrix-cell">
+                    </div>
+                    <div class="matrix-row">
+                        <input type="number" id="enc10" value="1" class="matrix-cell">
+                        <input type="number" id="enc11" value="0" class="matrix-cell">
+                    </div>
+                </div>
+                <button onclick="encodeDecode()" class="compute-btn">Process</button>
+            </div>
+        </div>
+        
+        <div id="encoded-output" class="encoded-output" style="display:none;">
+            <h3>📋 Encoded Result</h3>
+            <div class="encoded-display">
+                <code id="encoded-text"></code>
+                <button onclick="copyEncodedOutput()" class="copy-btn">Copy</button>
+            </div>
+            <div class="copy-feedback" id="copy-feedback" style="display:none;">✓ Copied to clipboard!</div>
+        </div>
+    </div>
+
+    <div class="output" id="output" style="display:none;"></div>
+</div>
+
+<script>
+    // Helper functions
+    function getMatrix(id, rows, cols) {
+        const matrix = [];
+        for (let i = 0; i < rows; ++i) {
+            matrix[i] = [];
+            for (let j = 0; j < cols; ++j) {
+                let v = document.getElementById(`${id}-${i}-${j}`).value;
+                matrix[i][j] = parseFloat(v) || 0;
+            }
+        }
+        return matrix;
+    }
+    function setMatrix(id, size, arr) {
+        for (let i = 0; i < size; ++i)
+            for (let j = 0; j < size; ++j)
+                document.getElementById(`${id}-${i}-${j}`).value = arr[i][j];
+    }
+    function matrixToHTML(matrix) {
+        return '<table style="border-collapse:collapse; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden;">'
+            + matrix.map(row =>
+                '<tr>' + row.map(val => `<td style="border:1px solid #e1e4e8;padding:12px 16px;text-align:center;background:white;font-weight:500;font-size:16px;">${Math.round(val*1000)/1000}</td>`).join('') + '</tr>'
+            ).join('') + '</table>';
+    }
+    function explainStep(text, title = '') {
+        if (title) {
+            return `<div class="step"><div class="step-title">${title}</div>${text}</div>`;
+        }
+        return `<div class="step">${text}</div>`;
+    }
+
+    function renderMatrices() {
+        let aRows = parseInt(document.getElementById('matrix-a-rows').value);
+        let aCols = parseInt(document.getElementById('matrix-a-cols').value);
+        let bRows = parseInt(document.getElementById('matrix-b-rows').value);
+        let bCols = parseInt(document.getElementById('matrix-b-cols').value);
+        
+        let matA = `<div class="matrix-label">Matrix A (${aRows}×${aCols})</div><div class="matrix-input">`;
+        for (let i = 0; i < aRows; ++i) {
+            matA += '<div class="matrix-row">';
+            for (let j = 0; j < aCols; ++j) {
+                matA += `<input id="A-${i}-${j}" type="number" step="any" value="${i === j ? 1 : 0}">`;
+            }
+            matA += '</div>';
+        }
+        matA += '</div>';
+        
+        let matB = `<div class="matrix-label">Matrix B (${bRows}×${bCols})</div><div class="matrix-input">`;
+        for (let i = 0; i < bRows; ++i) {
+            matB += '<div class="matrix-row">';
+            for (let j = 0; j < bCols; ++j) {
+                matB += `<input id="B-${i}-${j}" type="number" step="any" value="0">`;
+            }
+            matB += '</div>';
+        }
+        matB += '</div>';
+        
+        document.getElementById('matrixA-container').innerHTML = matA;
+        document.getElementById('matrixB-container').innerHTML = matB;
+        updateMatrixState();
+        showHideMatrixB();
+    }
+    function showHideMatrixB() {
+        const op = document.getElementById('operation').value;
+        const needsB = (op === 'add' || op === 'sub' || op === 'mul' || op === 'div');
+        const bWrapper = document.getElementById('matrixB-container').parentElement;
+        
+        if (needsB) {
+            bWrapper.style.display = '';
+            document.getElementById('matrix-b-active').checked = true;
+            updateMatrixState();
+        } else {
+            // For single matrix operations, only show A
+            document.getElementById('matrix-a-active').checked = true;
+            document.getElementById('matrix-b-active').checked = false;
+            updateMatrixState();
+        }
+    }
+    
+    function updateMatrixState() {
+        const aActive = document.getElementById('matrix-a-active').checked;
+        const bActive = document.getElementById('matrix-b-active').checked;
+        const aWrapper = document.getElementById('matrixA-container').parentElement;
+        const bWrapper = document.getElementById('matrixB-container').parentElement;
+        
+        if (aActive) {
+            aWrapper.classList.remove('disabled');
+        } else {
+            aWrapper.classList.add('disabled');
+        }
+        
+        if (bActive) {
+            bWrapper.classList.remove('disabled');
+        } else {
+            bWrapper.classList.add('disabled');
+        }
+        
+        updateOperationOptions();
+    }
+    
+    function addToMatrix(matrix, value) {
+        const rows = parseInt(document.getElementById(`matrix-${matrix.toLowerCase()}-rows`).value);
+        const cols = parseInt(document.getElementById(`matrix-${matrix.toLowerCase()}-cols`).value);
+        
+        for (let i = 0; i < rows; i++) {
+            for (let j = 0; j < cols; j++) {
+                const input = document.getElementById(`${matrix}-${i}-${j}`);
+                const currentValue = parseFloat(input.value) || 0;
+                input.value = currentValue + value;
+            }
+        }
+    }
+    
+    function clearMatrix(matrix) {
+        const rows = parseInt(document.getElementById(`matrix-${matrix.toLowerCase()}-rows`).value);
+        const cols = parseInt(document.getElementById(`matrix-${matrix.toLowerCase()}-cols`).value);
+        
+        for (let i = 0; i < rows; i++) {
+            for (let j = 0; j < cols; j++) {
+                document.getElementById(`${matrix}-${i}-${j}`).value = 0;
+            }
+        }
+    }
+    
+    function identityMatrix(matrix) {
+        const rows = parseInt(document.getElementById(`matrix-${matrix.toLowerCase()}-rows`).value);
+        const cols = parseInt(document.getElementById(`matrix-${matrix.toLowerCase()}-cols`).value);
+        
+        for (let i = 0; i < rows; i++) {
+            for (let j = 0; j < cols; j++) {
+                document.getElementById(`${matrix}-${i}-${j}`).value = (i === j) ? 1 : 0;
+            }
+        }
+    }
+    
+    function updateOperationOptions() {
+        let aRows = parseInt(document.getElementById('matrix-a-rows').value);
+        let aCols = parseInt(document.getElementById('matrix-a-cols').value);
+        let bRows = parseInt(document.getElementById('matrix-b-rows').value);
+        let bCols = parseInt(document.getElementById('matrix-b-cols').value);
+        
+        const aActive = document.getElementById('matrix-a-active').checked;
+        const bActive = document.getElementById('matrix-b-active').checked;
+        
+        const opSelect = document.getElementById('operation');
+        const currentOp = opSelect.value;
+        
+        // Check which operations are valid based on active matrices
+        const canAddSub = aActive && bActive && (aRows === bRows && aCols === bCols);
+        const canMultiply = aActive && bActive && (aCols === bRows);
+        const canDeterminant = aActive && (aRows === aCols); // Square matrix
+        const canInverse = aActive && (aRows === aCols); // Square matrix
+        const canTrace = aActive && (aRows === aCols); // Square matrix
+        const canDivide = aActive && bActive && (aCols === bRows && bRows === bCols); // Can multiply A by B^-1
+        
+        // Update option availability
+        opSelect.innerHTML = '';
+        
+        if (aActive && bActive) {
+            if (canAddSub) {
+                opSelect.innerHTML += '<option value="add">Addition (A + B)</option>';
+                opSelect.innerHTML += '<option value="sub">Subtraction (A - B)</option>';
+            }
+            if (canMultiply) {
+                opSelect.innerHTML += '<option value="mul">Multiplication (A × B)</option>';
+            }
+            if (canDivide) {
+                opSelect.innerHTML += '<option value="div">Division (A ÷ B)</option>';
+            }
+        }
+        
+        if (aActive) {
+            if (canDeterminant) {
+                opSelect.innerHTML += '<option value="det">Determinant |A|</option>';
+            }
+            if (canInverse) {
+                opSelect.innerHTML += '<option value="inv">Inverse A⁻¹</option>';
+            }
+            if (canTrace) {
+                opSelect.innerHTML += '<option value="trace">Trace (A)</option>';
+            }
+        }
+        
+        // Special operations for single B matrix
+        if (!aActive && bActive) {
+            if (bRows === bCols) {
+                opSelect.innerHTML += '<option value="det-b">Determinant |B|</option>';
+                opSelect.innerHTML += '<option value="inv-b">Inverse B⁻¹</option>';
+                opSelect.innerHTML += '<option value="trace-b">Trace (B)</option>';
+            }
+        }
+        
+        // If no operations available
+        if (opSelect.innerHTML === '') {
+            opSelect.innerHTML = '<option value="">No compatible operations</option>';
+        }
+        
+        // Try to restore previous selection if still valid
+        const options = Array.from(opSelect.options);
+        const hasCurrentOp = options.some(opt => opt.value === currentOp);
+        if (hasCurrentOp) {
+            opSelect.value = currentOp;
+        }
+    }
+    function compute() {
+        let aRows = parseInt(document.getElementById('matrix-a-rows').value);
+        let aCols = parseInt(document.getElementById('matrix-a-cols').value);
+        let bRows = parseInt(document.getElementById('matrix-b-rows').value);
+        let bCols = parseInt(document.getElementById('matrix-b-cols').value);
+        
+        const aActive = document.getElementById('matrix-a-active').checked;
+        const bActive = document.getElementById('matrix-b-active').checked;
+        
+        let A = null, B = null;
+        if (aActive) A = getMatrix('A', aRows, aCols);
+        if (bActive) B = getMatrix('B', bRows, bCols);
+        
+        let op = document.getElementById('operation').value;
+        let result = '', steps = '';
+        let Bshow = '';
+        
+        if (!op) {
+            result = '<div class="error">Please select a valid operation for these matrix sizes.</div>';
+            document.getElementById('output').innerHTML = result;
+            document.getElementById('output').style.display = 'block';
+            return;
+        }
+        
+        // Handle operations on matrix B when A is not active
+        if (op === 'det-b' || op === 'inv-b' || op === 'trace-b') {
+            const actualOp = op.replace('-b', '');
+            const matrix = B;
+            const rows = bRows;
+            const cols = bCols;
+            
+            if (actualOp === 'det') {
+                steps += `<div class="formula-box">Determinant: A single number that tells us if the matrix is invertible (non-zero det) or not (zero det)</div>`;
+                steps += explainStep(`<b>Matrix B:</b><br>${matrixToHTML(matrix)}`, 'Step 1: Given Matrix');
+                let detObj = matrixDeterminant(matrix, true);
+                steps += detObj.explain;
+                result = `<div class="final-result"><b>Determinant of B =</b> ${detObj.result}</div>`;
+            } else if (actualOp === 'inv') {
+                steps += `<div class="formula-box">Matrix Inverse: B⁻¹ such that B × B⁻¹ = I (identity matrix)</div>`;
+                steps += explainStep(`<b>Matrix B:</b><br>${matrixToHTML(matrix)}`, 'Step 1: Given Matrix');
+                let invObj = matrixInverse(matrix, true);
+                if (invObj === null) {
+                    result = `<div class="final-result" style="background:#ffebee;border-color:#f44336;"><b>Error:</b> This matrix is not invertible (determinant = 0).</div>`;
+                } else {
+                    steps += invObj.explain;
+                    result = `<div class="final-result"><b>Inverse Matrix B⁻¹:</b><br>${matrixToHTML(invObj.result)}</div>`;
+                }
+            } else if (actualOp === 'trace') {
+                steps += `<div class="formula-box">Trace: Sum of all diagonal elements (top-left to bottom-right)</div>`;
+                steps += explainStep(`<b>Matrix B:</b><br>${matrixToHTML(matrix)}`, 'Step 1: Given Matrix');
+                let tr = 0, calculations = 'Diagonal elements: ';
+                let minDim = Math.min(rows, cols);
+                for (let i = 0; i < minDim; ++i) {
+                    tr += matrix[i][i];
+                    calculations += `<div class="step-math">B[${i+1}][${i+1}] = ${matrix[i][i]}</div>`;
+                }
+                let diagonalElements = [];
+                for (let i = 0; i < minDim; ++i) {
+                    diagonalElements.push(matrix[i][i]);
+                }
+                calculations += `<div class="step-math">Sum: ${diagonalElements.join(' + ')} = ${tr}</div>`;
+                steps += explainStep(calculations, 'Step 2: Add Diagonal Elements');
+                result = `<div class="final-result"><b>Trace of B =</b> ${tr}</div>`;
+            }
+            document.getElementById('output').innerHTML = steps + result;
+            document.getElementById('output').style.display = 'block';
+            return;
+        }
+        
+        if (op === 'add' || op === 'sub' || op === 'mul' || op === 'div') {
+            Bshow = matrixToHTML(B);
+        }
+        if (op === 'add' || op === 'sub') {
+            steps += `<div class="formula-box">Formula: C[i][j] = A[i][j] ${op === 'add' ? "+" : "-"} B[i][j]</div>`;
+            steps += explainStep(`<b>Matrix A:</b><br>${matrixToHTML(A)}<br><br><b>Matrix B:</b><br>${matrixToHTML(B)}`, 
+                `Step 1: ${op === 'add' ? "Adding" : "Subtracting"} Two Matrices`);
+            
+            let C = [];
+            let calculations = '';
+            for (let i = 0; i < aRows; ++i) {
+                C[i] = [];
+                for (let j = 0; j < aCols; ++j) {
+                    C[i][j] = op === 'add' ? A[i][j] + B[i][j] : A[i][j] - B[i][j];
+                    calculations += `<div class="step-math">C[${i+1}][${j+1}] = ${A[i][j]} ${op === 'add' ? "+" : "-"} ${B[i][j]} = ${C[i][j]}</div>`;
+                }
+            }
+            steps += explainStep(calculations, 'Step 2: Calculate Each Element');
+            result = `<div class="final-result"><b>Final Result:</b><br>${matrixToHTML(C)}</div>`;
+        } else if (op === 'mul' || op === 'div') {
+            if (op === 'mul') {
+                steps += `<div class="formula-box">Formula: C[i][j] = Σ(A[i][k] × B[k][j]) for k = 1 to ${aCols}<br>
+                Result size: ${aRows}×${bCols}</div>`;
+            } else {
+                steps += `<div class="formula-box">Formula: A ÷ B = A × B⁻¹ (multiply A by inverse of B)</div>`;
+            }
+            
+            let M = B;
+            if (op === 'div') {
+                let invObj = matrixInverse(B, true);
+                if (invObj === null) {
+                    result = `<div class="final-result" style="background:#ffebee;border-color:#f44336;"><b>Error:</b> Matrix B is not invertible (determinant = 0). Cannot divide.</div>`;
+                    document.getElementById('output').innerHTML = result;
+                    return;
+                } else {
+                    steps += explainStep(invObj.explain, 'Step 1: Find Inverse of Matrix B');
+                    M = invObj.result;
+                    steps += explainStep(`<b>Matrix B⁻¹:</b><br>${matrixToHTML(M)}`, 'Step 2: Inverse Result');
+                }
+            }
+            
+            steps += explainStep(`<b>Matrix A:</b><br>${matrixToHTML(A)}<br><br><b>Matrix ${op === 'div' ? 'B⁻¹' : 'B'}:</b><br>${matrixToHTML(M)}`, 
+                op === 'div' ? 'Step 3: Matrices to Multiply' : 'Step 1: Matrices to Multiply');
+            
+            let C = [];
+            let calculations = '';
+            // For multiplication: result is aRows x bCols (or M cols)
+            let resultRows = aRows;
+            let resultCols = op === 'mul' ? bCols : aCols;
+            let innerDim = aCols; // This is also bRows for valid multiplication
+            
+            for (let i = 0; i < resultRows; ++i) {
+                C[i] = [];
+                for (let j = 0; j < resultCols; ++j) {
+                    let sum = 0, calc = [];
+                    calculations += `<b>C[${i+1}][${j+1}]:</b><br>`;
+                    for (let k = 0; k < innerDim; ++k) {
+                        sum += A[i][k] * M[k][j];
+                        calc.push(`(${A[i][k]} × ${M[k][j]})`);
+                    }
+                    C[i][j] = sum;
+                    calculations += `<div class="step-math">${calc.join(' + ')} = ${sum}</div>`;
+                }
+            }
+            steps += explainStep(calculations, op === 'div' ? 'Step 4: Calculate Each Element' : 'Step 2: Calculate Each Element');
+            result = `<div class="final-result"><b>Final Result:</b><br>${matrixToHTML(C)}</div>`;
+        } else if (op === 'det') {
+            steps += `<div class="formula-box">Determinant: A single number that tells us if the matrix is invertible (non-zero det) or not (zero det)</div>`;
+            steps += explainStep(`<b>Matrix A:</b><br>${matrixToHTML(A)}`, 'Step 1: Given Matrix');
+            let detObj = matrixDeterminant(A, true);
+            steps += detObj.explain;
+            result = `<div class="final-result"><b>Determinant of A =</b> ${detObj.result}</div>`;
+        } else if (op === 'inv') {
+            steps += `<div class="formula-box">Matrix Inverse: A⁻¹ such that A × A⁻¹ = I (identity matrix)</div>`;
+            steps += explainStep(`<b>Matrix A:</b><br>${matrixToHTML(A)}`, 'Step 1: Given Matrix');
+            let invObj = matrixInverse(A, true);
+            if (invObj === null) {
+                result = `<div class="final-result" style="background:#ffebee;border-color:#f44336;"><b>Error:</b> This matrix is not invertible (determinant = 0).</div>`;
+            } else {
+                steps += invObj.explain;
+                result = `<div class="final-result"><b>Inverse Matrix A⁻¹:</b><br>${matrixToHTML(invObj.result)}</div>`;
+            }
+        } else if (op === 'trace') {
+            steps += `<div class="formula-box">Trace: Sum of all diagonal elements (top-left to bottom-right)</div>`;
+            steps += explainStep(`<b>Matrix A:</b><br>${matrixToHTML(A)}`, 'Step 1: Given Matrix');
+            let tr = 0, calculations = 'Diagonal elements: ';
+            let minDim = Math.min(aRows, aCols);
+            for (let i = 0; i < minDim; ++i) {
+                tr += A[i][i];
+                calculations += `<div class="step-math">A[${i+1}][${i+1}] = ${A[i][i]}</div>`;
+            }
+            let diagonalElements = [];
+            for (let i = 0; i < minDim; ++i) {
+                diagonalElements.push(A[i][i]);
+            }
+            calculations += `<div class="step-math">Sum: ${diagonalElements.join(' + ')} = ${tr}</div>`;
+            steps += explainStep(calculations, 'Step 2: Add Diagonal Elements');
+            result = `<div class="final-result"><b>Trace of A =</b> ${tr}</div>`;
+        }
+        document.getElementById('output').innerHTML = steps + result;
+        document.getElementById('output').style.display = 'block';
+    }
+
+    function matrixDeterminant(m, explainMode) {
+        let det = 0, explain = '';
+        if (m.length === 1) {
+            det = m[0][0];
+            explain = explainStep(
+                `<div class="formula-box">For 1×1: det = a</div>
+                <div class="step-math">
+                det = ${m[0][0]}
+                </div>`, 
+                'Step 2: Calculate Determinant'
+            );
+            return explainMode ? {result: det, explain} : det;
+        } else if (m.length === 2) {
+            det = m[0][0]*m[1][1] - m[0][1]*m[1][0];
+            explain = explainStep(
+                `<div class="formula-box">For 2×2: det = ad - bc</div>
+                <div class="step-math">
+                det = (${m[0][0]} × ${m[1][1]}) - (${m[0][1]} × ${m[1][0]})<br>
+                det = ${m[0][0]*m[1][1]} - ${m[0][1]*m[1][0]}<br>
+                det = ${det}
+                </div>`, 
+                'Step 2: Calculate Determinant'
+            );
+            return explainMode ? {result: det, explain} : det;
+        } else if (m.length === 3) {
+            let a = m[0][0], b = m[0][1], c = m[0][2];
+            let d = m[1][0], e = m[1][1], f = m[1][2];
+            let g = m[2][0], h = m[2][1], i = m[2][2];
+            det = a*(e*i - f*h) - b*(d*i - f*g) + c*(d*h - e*g);
+            explain = explainStep(
+                `<div class="formula-box">For 3×3: det = a(ei - fh) - b(di - fg) + c(dh - eg)</div>
+                <b>Expansion along first row:</b>
+                <div class="step-math">
+                Minor 1: ei - fh = (${e} × ${i}) - (${f} × ${h}) = ${e*i} - ${f*h} = ${e*i-f*h}<br>
+                Minor 2: di - fg = (${d} × ${i}) - (${f} × ${g}) = ${d*i} - ${f*g} = ${d*i-f*g}<br>
+                Minor 3: dh - eg = (${d} × ${h}) - (${e} × ${g}) = ${d*h} - ${e*g} = ${d*h-e*g}
+                </div>
+                <b>Final calculation:</b>
+                <div class="step-math">
+                det = ${a} × (${e*i-f*h}) - ${b} × (${d*i-f*g}) + ${c} × (${d*h-e*g})<br>
+                det = ${a*(e*i-f*h)} - ${b*(d*i-f*g)} + ${c*(d*h-e*g)}<br>
+                det = ${det}
+                </div>`,
+                'Step 2: Calculate Determinant'
+            );
+            return explainMode ? {result: det, explain} : det;
+        }
+    }
+    function matrixInverse(m, explainMode) {
+        const n = m.length;
+        let explain = '';
+        const detObj = matrixDeterminant(m, true);
+        const det = detObj.result;
+        explain += explainStep('First, check if matrix is invertible by finding determinant', 'Step 2: Check Determinant');
+        explain += detObj.explain;
+        if (det === 0) return null;
+        let inv = [];
+        if (n === 1) {
+            // For 1x1 matrix, inverse is 1/det
+            inv = [[1/det]];
+            explain += explainStep(
+                `<div class="formula-box">For 1×1: inverse = 1/a</div>
+                <div class="step-math">Inverse = 1/${det} = ${1/det}</div>`,
+                'Step 3: Calculate Inverse'
+            );
+        } else if (n === 2) {
+            // adjugate: swap diag, change signs
+            inv = [
+                [ m[1][1], -m[0][1] ],
+                [ -m[1][0], m[0][0] ]
+            ];
+            explain += explainStep(
+                `<div class="formula-box">For 2×2: Adjugate = swap diagonal, negate off-diagonal</div>
+                <div class="step-math">
+                Adjugate = [${m[1][1]}, ${-m[0][1]}]<br>
+                                    [${-m[1][0]}, ${m[0][0]}]
+                </div>`,
+                'Step 3: Find Adjugate Matrix'
+            );
+            for (let i = 0; i < 2; ++i)
+                for (let j = 0; j < 2; ++j)
+                    inv[i][j] = inv[i][j] / det;
+            explain += explainStep(
+                `<div class="formula-box">Inverse = Adjugate ÷ determinant</div>
+                <div class="step-math">Divide each element by ${det}</div>
+                <b>Result:</b><br>${matrixToHTML(inv)}`,
+                'Step 4: Calculate Inverse'
+            );
+        } else if (n === 3) {
+            // minors and cofactors
+            let minors = [];
+            let minorCalcs = '';
+            for (let i = 0; i < 3; ++i) {
+                minors[i] = [];
+                for (let j = 0; j < 3; ++j) {
+                    let sub = [];
+                    for (let r = 0; r < 3; ++r) if (r !== i)
+                        for (let c = 0; c < 3; ++c) if (c !== j)
+                            sub.push(m[r][c]);
+                    minors[i][j] = sub[0]*sub[3] - sub[1]*sub[2];
+                    minorCalcs += `<div class="step-math">M[${i+1}][${j+1}] = ${sub[0]}×${sub[3]} - ${sub[1]}×${sub[2]} = ${minors[i][j]}</div>`;
+                }
+            }
+            explain += explainStep(minorCalcs, 'Step 3: Calculate Minors');
+            
+            // cofactor: checkerboard
+            let cof = [];
+            let sign = [[1, -1, 1], [-1, 1, -1], [1, -1, 1]];
+            let cofCalcs = '<div class="formula-box">Apply checkerboard sign pattern: + - + / - + - / + - +</div>';
+            for (let i = 0; i < 3; ++i) {
+                cof[i] = [];
+                for (let j = 0; j < 3; ++j) {
+                    cof[i][j] = minors[i][j] * sign[i][j];
+                    cofCalcs += `<div class="step-math">C[${i+1}][${j+1}] = ${minors[i][j]} × ${sign[i][j] > 0 ? '+1' : '-1'} = ${cof[i][j]}</div>`;
+                }
+            }
+            explain += explainStep(cofCalcs, 'Step 4: Calculate Cofactors');
+            
+            // adjugate: transpose
+            inv = [];
+            for (let i = 0; i < 3; ++i) {
+                inv[i] = [];
+                for (let j = 0; j < 3; ++j) {
+                    inv[i][j] = cof[j][i] / det;
+                }
+            }
+            explain += explainStep(
+                `<div class="formula-box">Transpose cofactor matrix, then divide by determinant</div>
+                <b>Final inverse (after dividing by ${det}):</b><br>${matrixToHTML(inv)}`,
+                'Step 5: Calculate Inverse'
+            );
+        }
+        return explainMode ? {result: inv, explain} : inv;
+    }
+    // Helper function to update placeholder based on mode
+    function updateEncodePlaceholder() {
+        const mode = document.getElementById('encode-mode').value;
+        const messageInput = document.getElementById('message');
+        const messageLabel = document.getElementById('message-label');
+        const inputHint = document.getElementById('input-hint');
+        
+        if (mode === 'encode') {
+            messageLabel.textContent = 'Message to encode (letters only):';
+            messageInput.placeholder = 'Enter text to encode (e.g., HELLO)';
+            inputHint.textContent = 'Letters will be converted to numbers (A=1, B=2, etc.). Odd-length messages will be padded with \'X\'.';
+        } else {
+            messageLabel.textContent = 'Encoded numbers to decode:';
+            messageInput.placeholder = 'Enter encoded numbers (e.g., 15 7 22 10) or paste from encoded output';
+            inputHint.textContent = 'Enter space-separated numbers. Can paste directly from encoded output.';
+        }
+        // Clear the encoded output when switching modes
+        document.getElementById('encoded-output').style.display = 'none';
+    }
+
+    // Function to copy encoded output
+    function copyEncodedOutput() {
+        const encodedText = document.getElementById('encoded-text').textContent;
+        navigator.clipboard.writeText(encodedText).then(() => {
+            const feedback = document.getElementById('copy-feedback');
+            feedback.style.display = 'block';
+            setTimeout(() => {
+                feedback.style.display = 'none';
+            }, 2000);
+        });
+    }
+
+    // Parse input - handles both text and number formats
+    function parseInput(input, mode) {
+        if (mode === 'encode') {
+            // For encoding, expect letters
+            return input.toUpperCase().replace(/[^A-Z]/g, '');
+        } else {
+            // For decoding, extract numbers from various formats
+            // Handle formats like: "15 7 22 10" or "[15, 7] [22, 10]" or "15,7,22,10"
+            const numbers = input.match(/-?\d+/g);
+            return numbers ? numbers.map(n => parseInt(n)) : [];
+        }
+    }
+
+    // Encoding and decoding
+    function encodeDecode() {
+        let mode = document.getElementById('encode-mode').value;
+        let rawInput = document.getElementById('message').value.trim();
+        let mtx = [
+            [parseInt(document.getElementById('enc00').value), parseInt(document.getElementById('enc01').value)],
+            [parseInt(document.getElementById('enc10').value), parseInt(document.getElementById('enc11').value)]
+        ];
+        let output = '';
+        let encodedForCopy = '';
+
+        // Helper functions
+        let letterToNum = c => c.charCodeAt(0) - 64; // A=1, B=2, ..., Z=26
+        let numToLetter = n => {
+            // Handle rounding and out of range
+            n = Math.round(n);
+            if (n < 1) return 'A'; // Default to A if too low
+            if (n > 26) return 'Z'; // Default to Z if too high
+            return String.fromCharCode(n + 64);
+        };
+
+        let nums = [];
+        let originalLength = 0; // Declare at function scope
+        let msg = ''; // Declare at function scope
+        
+        if (mode === 'encode') {
+            // Parse text input
+            msg = parseInput(rawInput, mode);
+            if (msg.length === 0) {
+                output = '<div class="error">Please enter some text to encode (letters only).</div>';
+                document.getElementById('output').innerHTML = output;
+        document.getElementById('output').style.display = 'block';
+                return;
+            }
+            
+            originalLength = msg.length; // Store original length
+            if (msg.length % 2 !== 0) {
+                msg += 'X'; // Pad to even for 2x2 blocks
+            }
+
+            // Convert letters to number pairs
+            for (let i = 0; i < msg.length; i += 2) {
+                nums.push([letterToNum(msg[i]), letterToNum(msg[i+1])]);
+            }
+
+            output += explainStep(
+                `<div class="formula-box">A=1, B=2, C=3, ..., Z=26</div>
+                <b>Original message:</b> ${rawInput.toUpperCase()}<br>
+                ${originalLength % 2 !== 0 ? `<b style="color: #ff6b00;">⚠️ Padded with 'X' (odd length message)</b><br>` : ''}
+                <b>Message to encode:</b> ${msg}<br>
+                <b>Letter breakdown:</b> ${msg.split('').map((c, i) => `${c}=${letterToNum(c)}`).join(', ')}<br>
+                <b>Number pairs for encoding:</b> ${nums.map(pair => `[${pair[0]}, ${pair[1]}]`).join(', ')}`,
+                'Step 1: Convert Letters to Numbers'
+            );
+        } else {
+            // Parse number input for decoding
+            let numbers = parseInput(rawInput, mode);
+            if (numbers.length === 0) {
+                output = '<div class="error">Please enter encoded numbers to decode.</div>';
+                document.getElementById('output').innerHTML = output;
+        document.getElementById('output').style.display = 'block';
+                return;
+            }
+            if (numbers.length % 2 !== 0) {
+                output = '<div class="error">Please enter an even number of values for 2x2 matrix decoding.</div>';
+                document.getElementById('output').innerHTML = output;
+        document.getElementById('output').style.display = 'block';
+                return;
+            }
+            
+            // Group numbers into pairs
+            for (let i = 0; i < numbers.length; i += 2) {
+                nums.push([numbers[i], numbers[i+1]]);
+            }
+            
+            output += explainStep(
+                `<b>Encoded number pairs:</b> ${nums.map(pair => `[${pair[0]}, ${pair[1]}]`).join(', ')}`,
+                'Step 1: Parse Encoded Numbers'
+            );
+        }
+
+        // 2. Step: Prepare matrix (or its inverse for decoding)
+        let matUsed, det, adj, invSteps = '';
+        if (mode === 'encode') {
+            matUsed = mtx;
+            output += explainStep(
+                `<b>Encoding Matrix:</b><br>${matrixToHTML(mtx)}`,
+                'Step 2: Encoding Matrix'
+            );
+        } else {
+            // Find inverse of encoding matrix
+            det = mtx[0][0]*mtx[1][1] - mtx[0][1]*mtx[1][0];
+            invSteps += `<div class="step-math">
+                det = (${mtx[0][0]} × ${mtx[1][1]}) - (${mtx[0][1]} × ${mtx[1][0]})<br>
+                det = ${mtx[0][0] * mtx[1][1]} - ${mtx[0][1] * mtx[1][0]} = ${det}
+            </div>`;
+            
+            if (det === 0) {
+                output = `<div class="error"><b>Error:</b> The encoding matrix is not invertible (determinant = 0). Cannot decode!<br>
+                    Please use a different encoding matrix with non-zero determinant.</div>`;
+                document.getElementById('output').innerHTML = output;
+        document.getElementById('output').style.display = 'block';
+                document.getElementById('encoded-output').style.display = 'none';
+                return;
+            }
+            
+            // Adjoint
+            adj = [
+                [mtx[1][1], -mtx[0][1]],
+                [-mtx[1][0], mtx[0][0]]
+            ];
+            
+            invSteps += `<b>Step 2a: Find Adjugate (swap diagonal, negate off-diagonal):</b><br>${matrixToHTML(adj)}<br>`;
+            
+            // Inverse
+            matUsed = [
+                [adj[0][0]/det, adj[0][1]/det],
+                [adj[1][0]/det, adj[1][1]/det]
+            ];
+            
+            invSteps += `<b>Step 2b: Divide by determinant (${det}):</b><br>${matrixToHTML(matUsed)}`;
+            
+            output += explainStep(
+                invSteps,
+                'Step 2: Calculate Inverse of Encoding Matrix'
+            );
+        }
+
+        // 3. Step: Encode or decode each pair
+        let results = [], stepByStep = '';
+        for (let block = 0; block < nums.length; ++block) {
+            let v = nums[block];
+            let res = [
+                v[0]*matUsed[0][0] + v[1]*matUsed[1][0],
+                v[0]*matUsed[0][1] + v[1]*matUsed[1][1]
+            ];
+            results.push(res);
+            stepByStep += `<div class="step-math">
+                Block ${block + 1}: [${v[0]}, ${v[1]}]<br>
+                Row 1: ${v[0]} × ${matUsed[0][0]} + ${v[1]} × ${matUsed[1][0]} = ${v[0]*matUsed[0][0]} + ${v[1]*matUsed[1][0]} = ${res[0]}<br>
+                Row 2: ${v[0]} × ${matUsed[0][1]} + ${v[1]} × ${matUsed[1][1]} = ${v[0]*matUsed[0][1]} + ${v[1]*matUsed[1][1]} = ${res[1]}<br>
+                Result: [${Math.round(res[0])}, ${Math.round(res[1])}]
+            </div>`;
+        }
+
+        if (mode === 'encode') {
+            output += explainStep(
+                `<div class="formula-box">Formula: [encoded] = [letter pair] × [encoding matrix]</div>
+                ${stepByStep}`,
+                'Step 3: Multiply Each Pair by Encoding Matrix'
+            );
+            
+            // Prepare encoded output for display and copying
+            encodedForCopy = results.map(r => `${Math.round(r[0])} ${Math.round(r[1])}`).join(' ');
+            
+            let encodedNote = '';
+            if (originalLength % 2 !== 0) {
+                encodedNote = `<div style="margin-top: 10px; font-size: 14px; color: #856404;">
+                    <b>ℹ️ Info:</b> Original message "${rawInput.toUpperCase()}" was padded with 'X' to make it even length.
+                </div>`;
+            }
+            
+            output += `<div class="final-result">
+                <b>Encoded Message:</b><br>
+                <div style="margin-top: 10px;">
+                    <span style="font-family: monospace; font-size: 20px; background: #f0f0f0; padding: 10px; border-radius: 4px; display: inline-block;">
+                        ${results.map(r => `[${Math.round(r[0])}, ${Math.round(r[1])}]`).join(' ')}
+                    </span>
+                </div>
+                <div style="margin-top: 10px; color: #666;">
+                    <small>Copy-friendly format: <code style="background: #e0e0e0; padding: 4px 8px; border-radius: 3px;">${encodedForCopy}</code></small>
+                </div>
+                ${encodedNote}
+            </div>`;
+            
+            // Show the copy-friendly output
+            document.getElementById('encoded-text').textContent = encodedForCopy;
+            document.getElementById('encoded-output').style.display = 'block';
+            
+        } else {
+            output += explainStep(
+                `<div class="formula-box">Formula: [decoded] = [encoded pair] × [inverse matrix]</div>
+                ${stepByStep}`,
+                'Step 3: Multiply Each Pair by Inverse Matrix'
+            );
+            
+            // Convert back to letters (rounding)
+            let msgDec = '';
+            let letterConversions = '';
+            for (let i = 0; i < results.length; i++) {
+                let n1 = Math.round(results[i][0]);
+                let n2 = Math.round(results[i][1]);
+                let l1 = numToLetter(n1);
+                let l2 = numToLetter(n2);
+                msgDec += l1 + l2;
+                letterConversions += `<div class="step-math">
+                    Pair ${i + 1}: [${n1}, ${n2}] → ${n1}=${l1}, ${n2}=${l2} → "${l1}${l2}"
+                </div>`;
+            }
+            
+            output += explainStep(
+                `<div class="formula-box">Convert numbers back to letters (1=A, 2=B, ..., 26=Z)</div>
+                ${letterConversions}`,
+                'Step 4: Convert Numbers to Letters'
+            );
+            
+            // Check if the last character is padding 'X'
+            let finalMessage = msgDec;
+            let paddingNote = '';
+            if (msgDec.endsWith('X') && msgDec.length > 1) {
+                paddingNote = `<div style="margin-top: 10px; padding: 10px; background: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; color: #856404;">
+                    <b>⚠️ Note:</b> The final 'X' might be padding added during encoding.
+                    <br>Original message was likely: <b style="color: #2566d1; font-size: 20px;">${msgDec.slice(0, -1)}</b>
+                </div>`;
+            }
+            
+            output += `<div class="final-result">
+                <b>Decoded Message:</b>
+                <div style="font-size: 28px; font-weight: bold; color: #2566d1; margin-top: 10px; letter-spacing: 2px;">
+                    ${msgDec}
+                </div>
+                ${paddingNote}
+            </div>`;
+            
+            // Hide encoded output section when decoding
+            document.getElementById('encoded-output').style.display = 'none';
+        }
+
+        document.getElementById('output').innerHTML = output;
+        document.getElementById('output').style.display = 'block';
+    }
+
+    // Add event listeners to update operations when sizes change
+    document.getElementById('matrix-a-rows').addEventListener('change', updateOperationOptions);
+    document.getElementById('matrix-a-cols').addEventListener('change', updateOperationOptions);
+    document.getElementById('matrix-b-rows').addEventListener('change', updateOperationOptions);
+    document.getElementById('matrix-b-cols').addEventListener('change', updateOperationOptions);
+    
+    // Initial render
+    renderMatrices();
+</script>
+</body>
+</html>
